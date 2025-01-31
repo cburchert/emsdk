@@ -9,9 +9,10 @@ FROZEN_CACHE = True
 
 system = platform.system()
 
-machine = "arm64" if platform.machine() in ('arm64', 'aarch64') else "amd64"
-nodejs_binary = "bin/nodejs/node.exe" if(system =="Windows") else "bin/node"
-NODE_JS = ROOT_DIR + "/external/nodejs_{}_{}/{}".format(system.lower(), machine, nodejs_binary)
+# machine = "arm64" if platform.machine() in ('arm64', 'aarch64') else "amd64"
+# nodejs_binary = "bin/nodejs/node.exe" if(system =="Windows") else "bin/node"
+# NODE_JS = ROOT_DIR + "/external/rules_nodejs~~node~nodejs_{}_{}/{}".format(system.lower(), machine, nodejs_binary)
+NODE_JS = os.path.join(ROOT_DIR, os.environ["NODE_JS_PATH"])
 
 
 # This works around an issue with Bazel RBE where the symlinks in node_modules/.bin

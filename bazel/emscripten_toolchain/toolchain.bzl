@@ -1,5 +1,6 @@
 """This module encapsulates logic to create emscripten_cc_toolchain_config rule."""
 
+load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load(
     "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
     "action_config",
@@ -14,7 +15,6 @@ load(
     "with_feature_set",
     _flag_set = "flag_set",
 )
-load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 
 def flag_set(flags = None, features = None, not_features = None, **kwargs):
     """Extension to flag_set which allows for a "simple" form.
@@ -71,6 +71,7 @@ def _impl(ctx):
     cc_target_os = "emscripten"
 
     emscripten_dir = ctx.attr.emscripten_binaries.label.workspace_root
+    nodejs_path = ctx.file.nodejs_bin.path
 
     builtin_sysroot = emscripten_dir + "/emscripten/cache/sysroot"
 
@@ -1060,6 +1061,10 @@ def _impl(ctx):
                     key = "EM_CONFIG_PATH",
                     value = ctx.file.em_config.path,
                 ),
+                env_entry(
+                    key = "NODE_JS_PATH",
+                    value = nodejs_path,
+                ),
             ],
         ),
         # Use llvm backend.  Off by default, enabled via --features=llvm_backend
@@ -1134,6 +1139,7 @@ emscripten_cc_toolchain_config_rule = rule(
         "cpu": attr.string(mandatory = True, values = ["asmjs", "wasm"]),
         "em_config": attr.label(mandatory = True, allow_single_file = True),
         "emscripten_binaries": attr.label(mandatory = True, cfg = "exec"),
+        "nodejs_bin": attr.label(mandatory = True, allow_single_file = True),
         "script_extension": attr.string(mandatory = True, values = ["sh", "bat"]),
     },
     provides = [CcToolchainConfigInfo],
