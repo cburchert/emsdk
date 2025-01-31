@@ -1,36 +1,20 @@
 # Bazel Emscripten toolchain
 
+Note: This is a fork with an experimental implementation of bzlmod to show how it can work. It requires some work to make it backwards compatible to be merged upstream (or at least tidy up, if we accept that users have to migrate when they update emsdk).
+
 ## Setup Instructions
 
-In `WORKSPACE` file, put:
+In `MODULE.bazel` file, put:
+
 ```starlark
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-git_repository(
-    name = "emsdk",
-    remote = "https://github.com/emscripten-core/emsdk.git",
-    tag = "3.1.64",
-    strip_prefix = "bazel",
+bazel_dep(name = "emsdk", version = "4.0.1")
+local_path_override(
+    module_name = "emsdk",
+    path = "third_party/emsdk/bazel",
 )
-
-load("@emsdk//:deps.bzl", emsdk_deps = "deps")
-emsdk_deps()
-
-load("@emsdk//:emscripten_deps.bzl", emsdk_emscripten_deps = "emscripten_deps")
-emsdk_emscripten_deps(emscripten_version = "3.1.64")
-
-load("@emsdk//:toolchains.bzl", "register_emscripten_toolchains")
-register_emscripten_toolchains()
-```
-The `tag` and `emscripten_version` parameters correspond to the git revision of
-[emsdk 3.1.64](https://github.com/emscripten-core/emsdk/releases/tag/3.1.64). To get access to
-newer versions, you'll need to update those. To make use of older versions, change the
-parameter of `git_repository` and `emsdk_emscripten_deps()`. Supported versions are listed in `revisions.bzl`
-
-Bazel 7+ additionally requires `platforms` dependencies in the `MODULE.bazel` file.
-```starlark
-bazel_dep(name = "platforms", version = "0.0.9")
 ```
 
+This assumes you copied this emsdk repository into `third_party/` in your workspace.
 
 ## Building
 
